@@ -1,5 +1,11 @@
 # 🏠 Plateforme Les Belles Années
 
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-red.svg)](https://streamlit.io)
+[![License](https://img.shields.io/badge/License-Proprietary-yellow.svg)]()
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
+
+
 **Plateforme tout-en-un pour la gestion et l'amélioration de la vie en résidence étudiante**
 
 Développée avec Streamlit pour Les Belles Années - Réseau de résidences étudiantes en France.
