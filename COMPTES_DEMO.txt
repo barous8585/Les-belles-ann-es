@@ -1,0 +1,178 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║         🔐 COMPTES DE DÉMONSTRATION - LES BELLES ANNÉES        ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. COMPTE RÉSIDENT PRINCIPAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Nom/Prénom    : Marie Dupont
+📧 Email         : demo.resident@lba.com
+🔑 Mot de passe  : demo123
+🏢 Résidence     : Les Belles Années Angers
+🚪 Logement      : A205
+📞 Téléphone     : 0612345678
+⭐ Points        : 150
+🎭 Rôle          : Résident
+
+📌 DONNÉES ASSOCIÉES :
+   • 2 incidents signalés
+   • 3 événements créés
+   • 4 annonces marketplace
+   • Historique de chat IA
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. COMPTE GESTIONNAIRE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Nom/Prénom    : Jean Martin
+📧 Email         : demo.gestionnaire@lba.com
+🔑 Mot de passe  : demo123
+🏢 Résidence     : Les Belles Années Angers
+🚪 Logement      : Bureau
+📞 Téléphone     : 0612345679
+⭐ Points        : 150
+🎭 Rôle          : Gestionnaire
+
+📌 FONCTIONNALITÉS SPÉCIALES :
+   • Accès aux statistiques de maintenance
+   • Gestion de tous les incidents de la résidence
+   • Validation/résolution des incidents
+   • Vue d'ensemble de tous les résidents
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. COMPTE RÉSIDENT SECONDAIRE 1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Nom/Prénom    : Pierre Bernard
+📧 Email         : etudiant1@example.com
+🔑 Mot de passe  : demo123
+🏢 Résidence     : Les Belles Années Lyon
+🚪 Logement      : B102
+📞 Téléphone     : 0612345680
+⭐ Points        : 150
+🎭 Rôle          : Résident
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. COMPTE RÉSIDENT SECONDAIRE 2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Nom/Prénom    : Sophie Petit
+📧 Email         : etudiant2@example.com
+🔑 Mot de passe  : demo123
+🏢 Résidence     : Les Belles Années Angers
+🚪 Logement      : A301
+📞 Téléphone     : 0612345681
+⭐ Points        : 150
+🎭 Rôle          : Résident
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 DONNÉES DE DÉMONSTRATION INCLUSES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 3 ÉVÉNEMENTS PROGRAMMÉS :
+   1. Soirée jeux de société (dans 3 jours)
+   2. Session sport collectif (dans 5 jours)
+   3. Atelier cuisine internationale (dans 7 jours)
+
+✅ 4 ANNONCES MARKETPLACE :
+   1. Vélo VTT en bon état - 80€
+   2. Livres de cours informatique - 30€
+   3. Micro-ondes à prêter - Gratuit
+   4. Canapé 2 places - 50€
+
+✅ 2 INCIDENTS EN COURS :
+   1. Fuite d'eau salle de bain (Priorité: Moyenne)
+   2. Ampoule grillée couloir (Priorité: Faible)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏢 RÉSIDENCES DISPONIBLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Les Belles Années Angers
+   📍 12 Rue de la Paix, 49000 Angers
+   🏠 Capacité: 150 logements
+
+2. Les Belles Années Lyon
+   📍 94 Quai Charles de Gaulle, 69006 Lyon
+   🏠 Capacité: 200 logements
+
+3. Les Belles Années Paris
+   📍 25 Avenue des Champs, 75008 Paris
+   🏠 Capacité: 180 logements
+
+4. Les Belles Années Bordeaux
+   📍 45 Rue Sainte-Catherine, 33000 Bordeaux
+   🏠 Capacité: 120 logements
+
+5. Les Belles Années Toulouse
+   📍 18 Place du Capitole, 31000 Toulouse
+   🏠 Capacité: 140 logements
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 SCÉNARIOS DE TEST RECOMMANDÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  Connexion Résident
+    → Tester les fonctionnalités principales
+    → Signaler un incident
+    → Créer un événement
+    → Publier une annonce marketplace
+
+2️⃣  Connexion Gestionnaire
+    → Consulter les statistiques
+    → Gérer les incidents (valider/résoudre)
+    → Vue d'ensemble de la résidence
+
+3️⃣  Test Assistant IA
+    → Poser diverses questions
+    → Tester les réponses contextuelles
+
+4️⃣  Test Réservations
+    → Réserver différents espaces
+    → Vérifier les conflits
+    → Consulter les disponibilités
+
+5️⃣  Test Programme Fidélité
+    → Participer à un événement (+10 pts)
+    → Créer une annonce (+5 pts)
+    → Consulter les récompenses
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  NOTES IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Tous les comptes utilisent le même mot de passe : demo123
+• Les données sont stockées dans data/lba_platform.db
+• Pour réinitialiser les données, supprimez le fichier .db
+• Les points de fidélité sont pré-chargés à 150 pour tous
+
+• Pour créer de nouvelles données démo :
+  python3 -c "from utils.demo_data import creer_donnees_demo; creer_donnees_demo()"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 DÉMARRAGE RAPIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. streamlit run app.py
+2. Ouvrir http://localhost:8501
+3. Se connecter avec demo.resident@lba.com / demo123
+4. Explorer toutes les fonctionnalités !
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║              🎉 BONNE DÉCOUVERTE DE LA PLATEFORME ! 🎉         ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝

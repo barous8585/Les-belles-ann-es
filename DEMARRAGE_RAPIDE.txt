@@ -1,0 +1,116 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║     🏠 PLATEFORME LES BELLES ANNÉES - DÉMARRAGE RAPIDE 🏠      ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+📋 ÉTAPES D'INSTALLATION (2 MINUTES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  Ouvrir le terminal dans le dossier du projet
+
+2️⃣  Installer les dépendances :
+    pip install -r requirements.txt
+
+3️⃣  Tester l'installation :
+    python3 test_installation.py
+
+4️⃣  Lancer l'application :
+    streamlit run app.py
+
+5️⃣  Ouvrir dans le navigateur :
+    http://localhost:8501
+
+
+🔐 COMPTES DE DÉMONSTRATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 COMPTE RÉSIDENT :
+   Email    : demo.resident@lba.com
+   Password : demo123
+
+👔 COMPTE GESTIONNAIRE :
+   Email    : demo.gestionnaire@lba.com
+   Password : demo123
+
+
+🎯 FONCTIONNALITÉS À TESTER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 🤖 Assistant IA Personnel
+   → Posez des questions sur la résidence, les réservations, etc.
+
+✅ 👥 Vie Communautaire
+   → Consultez et inscrivez-vous aux événements
+   → Explorez le marketplace
+
+✅ 🔧 Maintenance
+   → Signalez un incident
+   → Suivez le statut en temps réel
+
+✅ 📅 Réservations
+   → Réservez la laverie, salle de sport, etc.
+   → Consultez les disponibilités
+
+✅ ⭐ Programme Fidélité
+   → Gagnez des points
+   → Débloquezdes récompenses
+
+✅ ⚙️ Mon Compte
+   → Gérez votre profil
+   → Téléchargez des documents
+
+
+📚 DOCUMENTATION DISPONIBLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 README.md
+   → Documentation technique complète
+
+📄 GUIDE_DEMARRAGE.md
+   → Guide utilisateur détaillé
+
+📄 PRESENTATION_COMMERCIALE.md
+   → Pitch et arguments de vente
+
+📄 RECAP_PROJET.md
+   → Vue d'ensemble du projet
+
+
+🆘 PROBLÈMES COURANTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Erreur : "ModuleNotFoundError: No module named 'streamlit'"
+✅ Solution : pip install -r requirements.txt
+
+❌ Erreur : "Port 8501 already in use"
+✅ Solution : streamlit run app.py --server.port 8502
+
+❌ La page ne charge pas
+✅ Solution : Vérifiez que vous êtes dans le bon dossier
+             Relancez : streamlit run app.py
+
+
+🎁 DONNÉES DE DÉMONSTRATION INCLUSES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 4 comptes utilisateurs
+✅ 3 événements programmés
+✅ 4 annonces marketplace
+✅ 2 incidents en cours
+✅ 150 points fidélité pré-chargés
+✅ 5 résidences configurées
+
+
+📞 BESOIN D'AIDE ?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Consultez README.md pour plus de détails
+ou contactez le support technique.
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║         🚀 BONNE DÉCOUVERTE DE LA PLATEFORME ! 🚀              ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
