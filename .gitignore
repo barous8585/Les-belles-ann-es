@@ -11,4 +11,4 @@ data/*.db
 .env
 .DS_Store
 *.log
-.streamlit/
+.streamlit/secrets.toml
