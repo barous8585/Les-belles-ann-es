@@ -2,6 +2,7 @@ import sqlite3
 import bcrypt
 from datetime import datetime
 import os
+import streamlit as st
 
 DB_PATH = "data/lba_platform.db"
 
@@ -49,6 +50,7 @@ def init_database():
             residence TEXT NOT NULL,
             logement TEXT NOT NULL,
             user_id INTEGER NOT NULL,
+            photo_path TEXT,
             date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             date_resolution TIMESTAMP,
             note_satisfaction INTEGER,
@@ -126,7 +128,23 @@ def init_database():
         )
     ''')
     
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS login_attempts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            ip_address TEXT,
+            attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            success INTEGER DEFAULT 0
+        )
+    ''')
+    
     conn.commit()
+    
+    try:
+        cursor.execute("ALTER TABLE incidents ADD COLUMN photo_path TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
     
     cursor.execute("SELECT COUNT(*) FROM residences")
     if cursor.fetchone()[0] == 0:
@@ -150,3 +168,36 @@ def verify_password(password, hashed):
 
 def get_connection():
     return sqlite3.connect(DB_PATH)
+
+@st.cache_data(ttl=300)
+def get_residences_list():
+    """Cache la liste des résidences (TTL: 5 minutes)"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT nom FROM residences")
+    residences = [r[0] for r in cursor.fetchall()]
+    conn.close()
+    return residences
+
+@st.cache_data(ttl=60)
+def get_user_stats(user_id):
+    """Cache les statistiques utilisateur (TTL: 1 minute)"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM incidents WHERE user_id = ? AND statut != 'résolu'", (user_id,))
+    incidents_actifs = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM reservations WHERE user_id = ?", (user_id,))
+    reservations_actives = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT points_fidelite FROM users WHERE id = ?", (user_id,))
+    points = cursor.fetchone()[0]
+    
+    conn.close()
+    
+    return {
+        'incidents_actifs': incidents_actifs,
+        'reservations_actives': reservations_actives,
+        'points': points
+    }

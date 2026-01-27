@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.database import init_database
+from utils.database import init_database, get_residences_list
 from utils.auth import login_user, register_user, is_authenticated, get_current_user, logout
 import sqlite3
 
@@ -27,13 +27,13 @@ if not is_authenticated():
             submit = st.form_submit_button("Se connecter")
             
             if submit:
-                user = login_user(email, password)
+                user, error_msg = login_user(email, password)
                 if user:
                     st.session_state.user = user
                     st.success("Connexion réussie ! Bienvenue " + user['prenom'])
                     st.rerun()
                 else:
-                    st.error("Email ou mot de passe incorrect")
+                    st.error(error_msg if error_msg else "Email ou mot de passe incorrect")
     
     with tab2:
         st.subheader("Créer votre compte")
@@ -44,15 +44,12 @@ if not is_authenticated():
                 prenom = st.text_input("Prénom")
                 email = st.text_input("Email", key="reg_email")
                 password = st.text_input("Mot de passe", type="password", key="reg_password")
+                st.caption("🔒 Min 8 caractères, 1 majuscule, 1 chiffre")
             
             with col2:
                 type_user = st.selectbox("Type d utilisateur", ["Résident", "Gestionnaire", "Personnel"])
                 
-                conn = sqlite3.connect("data/lba_platform.db")
-                cursor = conn.cursor()
-                cursor.execute("SELECT nom FROM residences")
-                residences = [r[0] for r in cursor.fetchall()]
-                conn.close()
+                residences = get_residences_list()
                 
                 residence = st.selectbox("Résidence", residences)
                 numero_logement = st.text_input("Numéro de logement")
@@ -62,10 +59,11 @@ if not is_authenticated():
             
             if submit_reg:
                 if all([nom, prenom, email, password, residence]):
-                    if register_user(email, password, nom, prenom, type_user, residence, numero_logement, telephone):
-                        st.success("Compte créé avec succès ! Vous pouvez maintenant vous connecter.")
+                    success, message = register_user(email, password, nom, prenom, type_user, residence, numero_logement, telephone)
+                    if success:
+                        st.success(message)
                     else:
-                        st.error("Cet email est déjà utilisé")
+                        st.error(message)
                 else:
                     st.warning("Veuillez remplir tous les champs obligatoires")
 

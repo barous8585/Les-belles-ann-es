@@ -2,6 +2,11 @@ import streamlit as st
 from utils.auth import get_current_user
 import sqlite3
 from datetime import datetime
+import os
+from PIL import Image
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
 
 def show():
     user = get_current_user()
@@ -58,12 +63,22 @@ def signaler_incident(user):
             if titre and description:
                 priorite_simple = priorite.split(" - ")[0]
                 
+                photo_path = None
+                if photo:
+                    os.makedirs("data/uploads/incidents", exist_ok=True)
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    photo_filename = f"incident_{timestamp}_{user['id']}.{photo.name.split('.')[-1]}"
+                    photo_path = f"data/uploads/incidents/{photo_filename}"
+                    
+                    with open(photo_path, "wb") as f:
+                        f.write(photo.getbuffer())
+                
                 conn = sqlite3.connect("data/lba_platform.db")
                 cursor = conn.cursor()
                 cursor.execute("""
-                    INSERT INTO incidents (titre, description, categorie, priorite, residence, logement, user_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (titre, description, categorie, priorite_simple, user['residence'], user['logement'], user['id']))
+                    INSERT INTO incidents (titre, description, categorie, priorite, residence, logement, user_id, photo_path)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, (titre, description, categorie, priorite_simple, user['residence'], user['logement'], user['id'], photo_path))
                 conn.commit()
                 conn.close()
                 
@@ -82,7 +97,7 @@ def mes_incidents(user):
     if user['type'] in ['Gestionnaire', 'Personnel']:
         cursor.execute("""
             SELECT i.id, i.titre, i.description, i.categorie, i.priorite, i.statut, 
-                   i.date_creation, i.date_resolution, u.prenom, u.nom, i.logement
+                   i.date_creation, i.date_resolution, u.prenom, u.nom, i.logement, i.photo_path
             FROM incidents i
             JOIN users u ON i.user_id = u.id
             WHERE i.residence = ?
@@ -90,7 +105,7 @@ def mes_incidents(user):
         """, (user['residence'],))
     else:
         cursor.execute("""
-            SELECT id, titre, description, categorie, priorite, statut, date_creation, date_resolution
+            SELECT id, titre, description, categorie, priorite, statut, date_creation, date_resolution, photo_path
             FROM incidents
             WHERE user_id = ?
             ORDER BY date_creation DESC
@@ -107,9 +122,9 @@ def mes_incidents(user):
         
         for incident in incidents:
             if user['type'] in ['Gestionnaire', 'Personnel']:
-                inc_id, titre, desc, cat, prio, statut, date_c, date_r, prenom, nom, logement = incident
+                inc_id, titre, desc, cat, prio, statut, date_c, date_r, prenom, nom, logement, photo_path = incident
             else:
-                inc_id, titre, desc, cat, prio, statut, date_c, date_r = incident
+                inc_id, titre, desc, cat, prio, statut, date_c, date_r, photo_path = incident
             
             if statut not in statut_filter:
                 continue
@@ -118,7 +133,7 @@ def mes_incidents(user):
             priorite_emoji = {"Faible": "🟢", "Moyenne": "🟡", "Haute": "🟠", "Critique": "🔴"}
             
             with st.expander(f"{statut_emoji.get(statut, '')} {titre} - {statut}"):
-                col1, col2 = st.columns(2)
+                col1, col2 = st.columns([2, 1])
                 
                 with col1:
                     st.write(f"**Catégorie:** {cat}")
@@ -131,6 +146,13 @@ def mes_incidents(user):
                     st.write(f"**Date signalement:** {date_c}")
                     if date_r:
                         st.write(f"**Date résolution:** {date_r}")
+                    
+                    if photo_path and os.path.exists(photo_path):
+                        try:
+                            image = Image.open(photo_path)
+                            st.image(image, caption="Photo incident", width=200)
+                        except:
+                            st.caption("📷 Photo disponible")
                 
                 st.write(f"**Description:** {desc}")
                 
@@ -194,12 +216,77 @@ def statistiques_maintenance():
     with col4:
         st.metric("⭐ Satisfaction", f"{satisfaction:.1f}/5")
     
-    st.markdown("### Répartition par catégorie")
-    cursor.execute("SELECT categorie, COUNT(*) FROM incidents GROUP BY categorie ORDER BY COUNT(*) DESC")
-    categories = cursor.fetchall()
+    st.markdown("---")
     
-    if categories:
-        for cat, count in categories:
-            st.write(f"**{cat}:** {count} incident(s)")
+    col_chart1, col_chart2 = st.columns(2)
+    
+    with col_chart1:
+        st.markdown("### 📊 Répartition par catégorie")
+        cursor.execute("SELECT categorie, COUNT(*) as count FROM incidents GROUP BY categorie ORDER BY count DESC")
+        categories_data = cursor.fetchall()
+        
+        if categories_data:
+            df_cat = pd.DataFrame(categories_data, columns=['Catégorie', 'Nombre'])
+            fig_cat = px.bar(df_cat, x='Catégorie', y='Nombre', 
+                            color='Nombre',
+                            color_continuous_scale='Blues')
+            fig_cat.update_layout(height=300, showlegend=False)
+            st.plotly_chart(fig_cat, use_container_width=True)
+    
+    with col_chart2:
+        st.markdown("### 🎯 Statuts des incidents")
+        statuts_data = [
+            {'Statut': 'Nouveaux', 'Nombre': nouveaux},
+            {'Statut': 'En cours', 'Nombre': en_cours},
+            {'Statut': 'Résolus', 'Nombre': resolus}
+        ]
+        df_statuts = pd.DataFrame(statuts_data)
+        fig_statuts = px.pie(df_statuts, values='Nombre', names='Statut',
+                             color_discrete_sequence=['#ff6b6b', '#ffd93d', '#6bcf7f'])
+        fig_statuts.update_layout(height=300)
+        st.plotly_chart(fig_statuts, use_container_width=True)
+    
+    st.markdown("---")
+    
+    st.markdown("### 🔥 Priorités des incidents actifs")
+    cursor.execute("""
+        SELECT priorite, COUNT(*) as count 
+        FROM incidents 
+        WHERE statut != 'résolu'
+        GROUP BY priorite
+        ORDER BY 
+            CASE priorite
+                WHEN 'Critique' THEN 1
+                WHEN 'Haute' THEN 2
+                WHEN 'Moyenne' THEN 3
+                WHEN 'Faible' THEN 4
+            END
+    """)
+    priorites_data = cursor.fetchall()
+    
+    if priorites_data:
+        df_prio = pd.DataFrame(priorites_data, columns=['Priorité', 'Nombre'])
+        fig_prio = go.Figure(data=[
+            go.Bar(x=df_prio['Priorité'], y=df_prio['Nombre'],
+                  marker_color=['#e74c3c', '#e67e22', '#f39c12', '#27ae60'])
+        ])
+        fig_prio.update_layout(height=300, title="Incidents actifs par priorité")
+        st.plotly_chart(fig_prio, use_container_width=True)
+    
+    st.markdown("### 📋 Détails par catégorie")
+    cursor.execute("""
+        SELECT categorie, COUNT(*) as total,
+               SUM(CASE WHEN statut = 'résolu' THEN 1 ELSE 0 END) as resolus
+        FROM incidents 
+        GROUP BY categorie 
+        ORDER BY total DESC
+    """)
+    details = cursor.fetchall()
+    
+    if details:
+        for cat, total, res in details:
+            taux = (res / total * 100) if total > 0 else 0
+            st.write(f"**{cat}:** {total} incident(s) - {res} résolu(s) ({taux:.0f}%)")
+            st.progress(taux / 100)
     
     conn.close()

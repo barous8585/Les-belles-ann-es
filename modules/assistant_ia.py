@@ -44,7 +44,7 @@ def generer_reponse_ia(message, user):
     ville = residence.split()[-1] if residence else "votre ville"
     
     # Réservations
-    if any(word in message_lower for word in ["réserver", "réservation", "laverie", "salle", "sport", "booking"]):
+    if any(word in message_lower for word in ["réserver", "réservation", "laverie", "salle", "sport", "booking", "réserve", "disponibilité", "dispo", "machine", "laver", "linge", "fitness", "gym", "entrainement"]):
         if "laverie" in message_lower:
             return f"""🧺 **Réservation de la laverie**
 
@@ -84,7 +84,7 @@ Vous pouvez réserver :
 ➡️ Rendez-vous dans **📅 Réservations** pour réserver !"""
     
     # Incidents et maintenance
-    elif any(word in message_lower for word in ["problème", "panne", "cassé", "incident", "réparation", "bug"]):
+    elif any(word in message_lower for word in ["problème", "panne", "cassé", "incident", "réparation", "bug", "défaut", "fuite", "marche pas", "fonctionne pas", "dysfonctionnement", "help", "urgent", "sos"]):
         return f"""🔧 **Signalement d'incident**
 
 Pour signaler un problème :
@@ -106,7 +106,7 @@ Pour signaler un problème :
 📊 Vous pouvez suivre l'état en temps réel dans "Mes incidents" !"""
     
     # Événements
-    elif any(word in message_lower for word in ["événement", "activité", "soirée", "sortie", "fête"]):
+    elif any(word in message_lower for word in ["événement", "activité", "soirée", "sortie", "fête", "animation", "event", "happening", "rencontre", "party", "atelier"]):
         conn = sqlite3.connect("data/lba_platform.db")
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM evenements WHERE residence = ? AND statut = 'ouvert'", (residence,))
@@ -131,7 +131,7 @@ Pour signaler un problème :
 💡 Idées populaires : soirées jeux, sessions sport, ateliers cuisine, ciné-débats"""
     
     # Marketplace
-    elif any(word in message_lower for word in ["vendre", "acheter", "marketplace", "annonce", "occasion"]):
+    elif any(word in message_lower for word in ["vendre", "acheter", "marketplace", "annonce", "occasion", "vente", "achat", "vends", "achète", "cherche", "recherche", "seconde main"]):
         conn = sqlite3.connect("data/lba_platform.db")
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM marketplace WHERE residence = ? AND statut = 'disponible'", (residence,))
@@ -196,7 +196,7 @@ Pour signaler un problème :
 📄 Pensez à télécharger votre attestation dans **Mon Compte** pour la transmettre !"""
     
     # Points fidélité
-    elif any(word in message_lower for word in ["point", "fidélité", "récompense", "gagner"]):
+    elif any(word in message_lower for word in ["point", "fidélité", "récompense", "gagner", "bonus", "points", "cadeau", "avantage", "promo", "réduction"]):
         return f"""⭐ **Programme de Fidélité - Vous avez {user['points']} points !**
 
 **Comment gagner des points ?**

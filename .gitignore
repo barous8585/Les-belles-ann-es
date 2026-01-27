@@ -12,3 +12,5 @@ data/*.db
 .DS_Store
 *.log
 .streamlit/secrets.toml
+data/uploads/
+*.bak*

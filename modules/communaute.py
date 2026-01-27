@@ -105,10 +105,25 @@ def show_marketplace(user):
     with col1:
         st.markdown("### 🛍️ Annonces disponibles")
         
+        col_filter1, col_filter2 = st.columns(2)
+        with col_filter1:
+            filter_type = st.multiselect(
+                "Type d'annonce",
+                ["Vente", "Achat", "Prêt", "Échange"],
+                default=["Vente", "Prêt", "Échange"]
+            )
+        with col_filter2:
+            filter_cat = st.multiselect(
+                "Catégorie",
+                ["Meubles", "Électronique", "Livres", "Vêtements", "Sport", "Autre"],
+                default=["Meubles", "Électronique", "Livres", "Vêtements", "Sport", "Autre"]
+            )
+        
         conn = sqlite3.connect("data/lba_platform.db")
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT m.id, m.titre, m.description, m.type_annonce, m.prix, m.categorie, u.prenom, u.nom, m.date_creation
+            SELECT m.id, m.titre, m.description, m.type_annonce, m.prix, m.categorie, 
+                   u.prenom, u.nom, m.date_creation, u.email, u.telephone, u.id as vendeur_id
             FROM marketplace m
             JOIN users u ON m.vendeur_id = u.id
             WHERE m.residence = ? AND m.statut = 'disponible'
@@ -118,7 +133,10 @@ def show_marketplace(user):
         
         if annonces:
             for annonce in annonces:
-                ann_id, titre, desc, type_ann, prix, cat, prenom, nom, date_creation = annonce
+                ann_id, titre, desc, type_ann, prix, cat, prenom, nom, date_creation, email_vendeur, tel_vendeur, vendeur_id = annonce
+                
+                if type_ann not in filter_type or cat not in filter_cat:
+                    continue
                 
                 with st.expander(f"{titre} - {type_ann}"):
                     st.write(f"**Catégorie:** {cat}")
@@ -129,7 +147,15 @@ def show_marketplace(user):
                         st.write(f"**Prix:** Gratuit (prêt)")
                     st.write(f"**👤 Proposé par:** {prenom} {nom}")
                     st.write(f"**📅 Publié le:** {date_creation}")
-                    st.button("Contacter", key=f"contact_{ann_id}")
+                    
+                    if vendeur_id != user['id']:
+                        if st.button("📧 Voir les coordonnées", key=f"contact_{ann_id}"):
+                            st.info(f"📧 **Email:** {email_vendeur}")
+                            if tel_vendeur:
+                                st.info(f"📞 **Téléphone:** {tel_vendeur}")
+                            st.success("💬 Contactez directement le vendeur !")
+                    else:
+                        st.caption("💡 C'est votre annonce")
         else:
             st.info("Aucune annonce pour le moment. Soyez le premier !")
         
