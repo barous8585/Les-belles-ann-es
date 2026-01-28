@@ -5,18 +5,27 @@ from datetime import datetime
 
 def show():
     user = get_current_user()
-    st.title("⚙️ Mon Compte")
+    st.title("⚙️ Mon Compte" if user['type'] == 'Résident' else "⚙️ Paramètres")
     
-    tab1, tab2, tab3 = st.tabs(["👤 Profil", "⭐ Fidélité", "📄 Documents"])
-    
-    with tab1:
-        show_profil(user)
-    
-    with tab2:
-        show_fidelite(user)
-    
-    with tab3:
-        show_documents(user)
+    if user['type'] == 'Résident':
+        tab1, tab2, tab3 = st.tabs(["👤 Profil", "⭐ Fidélité", "📄 Documents"])
+        
+        with tab1:
+            show_profil(user)
+        
+        with tab2:
+            show_fidelite(user)
+        
+        with tab3:
+            show_documents(user)
+    else:
+        tab1, tab2 = st.tabs(["👤 Profil", "⚙️ Préférences"])
+        
+        with tab1:
+            show_profil(user)
+        
+        with tab2:
+            show_preferences_gestionnaire(user)
 
 def show_profil(user):
     st.subheader("Informations personnelles")
@@ -32,7 +41,8 @@ def show_profil(user):
     with col2:
         st.write(f"**Type de compte:** {user['type']}")
         st.write(f"**Résidence:** {user['residence']}")
-        st.write(f"**Logement:** {user['logement']}")
+        if user['type'] == 'Résident':
+            st.write(f"**Logement:** {user['logement']}")
     
     st.markdown("---")
     
@@ -51,8 +61,13 @@ def show_profil(user):
             
             if new_password:
                 from utils.database import hash_password
-                hashed_pw = hash_password(new_password)
-                cursor.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user['id']))
+                from utils.validators import validate_password
+                is_valid, msg = validate_password(new_password)
+                if not is_valid:
+                    st.error(msg)
+                else:
+                    hashed_pw = hash_password(new_password)
+                    cursor.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user['id']))
             
             conn.commit()
             conn.close()
@@ -60,6 +75,24 @@ def show_profil(user):
             st.success("✅ Informations mises à jour !")
             st.session_state.user['telephone'] = new_telephone
             st.rerun()
+
+def show_preferences_gestionnaire(user):
+    st.subheader("⚙️ Préférences de Gestion")
+    
+    st.info("💡 Configuration avancée pour la gestion de votre résidence")
+    
+    st.markdown("### 🔔 Notifications")
+    notif_incidents = st.checkbox("Recevoir notifications nouveaux incidents", value=True)
+    notif_reservations = st.checkbox("Recevoir notifications nouvelles réservations", value=False)
+    notif_marketplace = st.checkbox("Recevoir notifications nouvelles annonces", value=False)
+    
+    st.markdown("### 📊 Rapports")
+    rapport_hebdo = st.checkbox("Rapport hebdomadaire par email", value=True)
+    rapport_mensuel = st.checkbox("Rapport mensuel détaillé", value=True)
+    
+    if st.button("💾 Sauvegarder préférences"):
+        st.success("✅ Préférences sauvegardées !")
+        st.info("🚧 Fonctionnalité en cours de développement")
 
 def show_fidelite(user):
     st.subheader("Programme de Fidélité")

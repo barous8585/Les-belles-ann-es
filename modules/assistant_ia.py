@@ -5,9 +5,16 @@ from datetime import datetime
 
 def show():
     user = get_current_user()
-    st.title("🤖 Assistant IA Personnel")
     
-    st.info("💡 Posez-moi vos questions sur : réservations, aide administrative, informations résidence, bons plans locaux, etc.")
+    if user['type'] == 'Résident':
+        st.title("🤖 Assistant IA Personnel")
+        st.info("💡 Posez-moi vos questions sur : réservations, aide administrative, informations résidence, bons plans locaux, etc.")
+    elif user['type'] == 'Gestionnaire':
+        st.title("🤖 Assistant Gestionnaire")
+        st.info("💡 Posez-moi vos questions sur : gestion incidents, statistiques, réservations, modération, etc.")
+    else:
+        st.title("🤖 Assistant Personnel")
+        st.info("💡 Posez-moi vos questions sur : interventions, maintenance, planning, etc.")
     
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
@@ -42,7 +49,98 @@ def generer_reponse_ia(message, user):
     message_lower = message.lower()
     residence = user['residence']
     ville = residence.split()[-1] if residence else "votre ville"
+    user_type = user['type']
     
+    # RÉPONSES SPÉCIFIQUES GESTIONNAIRES
+    if user_type in ['Gestionnaire', 'Personnel']:
+        if any(word in message_lower for word in ["incident", "problème", "maintenance", "réparation"]):
+            return f"""🔧 **Gestion des Incidents - {residence}**
+
+**Vue d'ensemble :**
+Allez dans **🔧 Maintenance** > **📈 Statistiques** pour voir :
+- Incidents nouveaux à traiter
+- Incidents en cours
+- Taux de satisfaction
+- Répartition par catégorie
+
+**Actions rapides :**
+- Changer statut : nouveau → en_cours → résolu
+- Voir tous les incidents de la résidence
+- Filtrer par priorité/catégorie
+
+💡 Les incidents critiques sont en haut de la liste !"""
+        
+        elif any(word in message_lower for word in ["réservation", "planning", "occupation"]):
+            return f"""📅 **Planning Global - {residence}**
+
+**Accédez au planning :**
+Menu **📅 Planning Global** pour :
+- Voir toutes les réservations
+- Filtrer par date/espace
+- Bloquer des créneaux (maintenance)
+- Statistiques d'utilisation
+
+**Espaces les plus réservés :**
+Consultez les statistiques pour optimiser la gestion !
+
+💡 Vous pouvez annuler une réservation si nécessaire."""
+        
+        elif any(word in message_lower for word in ["modération", "marketplace", "événement", "annonce"]):
+            return f"""👥 **Modération Communauté**
+
+**Accédez à la modération :**
+Menu **👥 Modération** pour :
+- Modérer annonces marketplace
+- Valider/Annuler événements
+- Voir top contributeurs
+- Statistiques communauté
+
+**Actions possibles :**
+- Supprimer/Restaurer annonces
+- Annuler/Réactiver événements
+- Contacter organisateurs
+
+💡 Gardez la communauté saine et active !"""
+        
+        elif any(word in message_lower for word in ["statistique", "analytics", "kpi", "dashboard"]):
+            return f"""📊 **Analytics & KPIs - {residence}**
+
+**Dashboard principal :**
+Menu **📊 Dashboard** affiche :
+- Incidents nouveaux/en cours
+- Nombre de résidents
+- Réservations futures
+- Activité de la semaine
+
+**Analytics détaillées :**
+Menu **📈 Analytics** pour graphiques avancés :
+- Répartition incidents par catégorie
+- Statuts (camembert)
+- Priorités actives
+- Taux de résolution
+
+💡 Utilisez ces données pour optimiser la gestion !"""
+        
+        else:
+            return f"""🤖 **Assistant Gestionnaire - {residence}**
+
+**Modules disponibles :**
+
+📊 **Dashboard** - Vue d'ensemble KPIs
+🔧 **Maintenance** - Gérer tous les incidents
+📅 **Planning Global** - Toutes les réservations
+👥 **Modération** - Marketplace & Événements
+📈 **Analytics** - Statistiques avancées
+
+**Questions fréquentes :**
+- "Combien d'incidents nouveaux ?"
+- "Qui a réservé la laverie aujourd'hui ?"
+- "Quelles annonces marketplace modérer ?"
+- "Statistiques satisfaction résidents ?"
+
+**Que puis-je faire pour vous ?**"""
+    
+    # RÉPONSES POUR RÉSIDENTS (suite du code original)
     # Réservations
     if any(word in message_lower for word in ["réserver", "réservation", "laverie", "salle", "sport", "booking", "réserve", "disponibilité", "dispo", "machine", "laver", "linge", "fitness", "gym", "entrainement"]):
         if "laverie" in message_lower:
