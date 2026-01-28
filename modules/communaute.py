@@ -103,7 +103,7 @@ def show_marketplace(user):
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("### 🛍️ Annonces disponibles")
+        st.markdown("### 🛍️ Marketplace Communautaire")
         
         col_filter1, col_filter2 = st.columns(2)
         with col_filter1:
@@ -131,33 +131,126 @@ def show_marketplace(user):
         """, (user['residence'],))
         annonces = cursor.fetchall()
         
+        # CSS pour hover effects
+        st.markdown("""
+            <style>
+            .marketplace-card {
+                background: rgba(255,255,255,0.05);
+                backdrop-filter: blur(10px);
+                padding: 1.5rem;
+                border-radius: 16px;
+                border: 1px solid rgba(255,255,255,0.1);
+                margin-bottom: 1rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+            }
+            .marketplace-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+                border-color: rgba(102, 126, 234, 0.5);
+                background: rgba(255,255,255,0.08);
+            }
+            .price-tag {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                color: #fff;
+                font-weight: 700;
+                font-size: 1.2rem;
+                display: inline-block;
+            }
+            .category-badge {
+                background: rgba(102, 126, 234, 0.2);
+                padding: 0.25rem 0.75rem;
+                border-radius: 12px;
+                color: #667eea;
+                font-size: 0.85rem;
+                font-weight: 600;
+                border: 1px solid rgba(102, 126, 234, 0.3);
+            }
+            </style>
+        """, unsafe_allow_html=True)
+        
         if annonces:
-            for annonce in annonces:
-                ann_id, titre, desc, type_ann, prix, cat, prenom, nom, date_creation, email_vendeur, tel_vendeur, vendeur_id = annonce
-                
-                if type_ann not in filter_type or cat not in filter_cat:
-                    continue
-                
-                with st.expander(f"{titre} - {type_ann}"):
-                    st.write(f"**Catégorie:** {cat}")
-                    st.write(f"**Description:** {desc}")
-                    if type_ann == "Vente":
-                        st.write(f"**💰 Prix:** {prix}€")
-                    elif type_ann == "Prêt":
-                        st.write(f"**Prix:** Gratuit (prêt)")
-                    st.write(f"**👤 Proposé par:** {prenom} {nom}")
-                    st.write(f"**📅 Publié le:** {date_creation}")
+            annonces_filtrees = [a for a in annonces if a[3] in filter_type and a[5] in filter_cat]
+            
+            if annonces_filtrees:
+                # Affichage en grille style Pinterest
+                for i in range(0, len(annonces_filtrees), 2):
+                    cols = st.columns(2)
                     
-                    if vendeur_id != user['id']:
-                        if st.button("📧 Voir les coordonnées", key=f"contact_{ann_id}"):
-                            st.info(f"📧 **Email:** {email_vendeur}")
-                            if tel_vendeur:
-                                st.info(f"📞 **Téléphone:** {tel_vendeur}")
-                            st.success("💬 Contactez directement le vendeur !")
-                    else:
-                        st.caption("💡 C'est votre annonce")
+                    for idx, col in enumerate(cols):
+                        if i + idx < len(annonces_filtrees):
+                            annonce = annonces_filtrees[i + idx]
+                            ann_id, titre, desc, type_ann, prix, cat, prenom, nom, date_creation, email_vendeur, tel_vendeur, vendeur_id = annonce
+                            
+                            with col:
+                                # Couleurs par type d'annonce
+                                type_colors = {
+                                    "Vente": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                    "Achat": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                                    "Prêt": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                                    "Échange": "linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+                                }
+                                
+                                type_icons = {
+                                    "Vente": "💰",
+                                    "Achat": "🛒",
+                                    "Prêt": "🤝",
+                                    "Échange": "🔄"
+                                }
+                                
+                                st.markdown(f"""
+                                    <div class="marketplace-card">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                            <span style="background: {type_colors.get(type_ann, '')}; padding: 0.25rem 0.75rem; border-radius: 20px; color: #fff; font-size: 0.85rem; font-weight: 600;">
+                                                {type_icons.get(type_ann, '')} {type_ann}
+                                            </span>
+                                            <span class="category-badge">{cat}</span>
+                                        </div>
+                                        <h4 style="color: #fff; margin: 0 0 0.75rem 0; font-size: 1.2rem; font-weight: 700;">{titre}</h4>
+                                        <p style="color: rgba(255,255,255,0.8); margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.5;">{desc[:100]}{'...' if len(desc) > 100 else ''}</p>
+                                """, unsafe_allow_html=True)
+                                
+                                if type_ann == "Vente":
+                                    st.markdown(f"""
+                                        <div style="margin-bottom: 1rem;">
+                                            <span class="price-tag">{prix}€</span>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                                elif type_ann == "Prêt":
+                                    st.markdown(f"""
+                                        <div style="margin-bottom: 1rem;">
+                                            <span style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.5rem 1rem; border-radius: 20px; color: #fff; font-weight: 700; font-size: 1rem;">
+                                                Gratuit 🎁
+                                            </span>
+                                        </div>
+                                    """, unsafe_allow_html=True)
+                                
+                                st.markdown(f"""
+                                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-top: 1rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <div>
+                                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 0;">👤 {prenom} {nom}</p>
+                                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin: 0.25rem 0 0 0;">📅 {date_creation}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                """, unsafe_allow_html=True)
+                                
+                                if vendeur_id != user['id']:
+                                    if st.button("📧 Contacter", key=f"contact_{ann_id}", use_container_width=True):
+                                        st.info(f"📧 **Email:** {email_vendeur}")
+                                        if tel_vendeur:
+                                            st.info(f"📞 **Téléphone:** {tel_vendeur}")
+                                        st.success("💬 Contactez directement le vendeur !")
+                                else:
+                                    st.caption("💡 C'est votre annonce")
+            else:
+                st.info("🔍 Aucune annonce ne correspond à vos filtres")
         else:
-            st.info("Aucune annonce pour le moment. Soyez le premier !")
+            st.info("📭 Aucune annonce pour le moment. Soyez le premier à publier !")
         
         conn.close()
     

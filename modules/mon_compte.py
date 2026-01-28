@@ -28,31 +28,57 @@ def show():
             show_preferences_gestionnaire(user)
 
 def show_profil(user):
-    st.subheader("Informations personnelles")
+    # Profil Card élégant
+    st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div style="background: rgba(255,255,255,0.2); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 4px solid rgba(255,255,255,0.3);">
+                    👤
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="color: #fff; margin: 0; font-size: 1.8rem; font-weight: 700;">{user['prenom']} {user['nom']}</h2>
+                    <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0; font-size: 1.1rem;">{user['type']}</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <span style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; color: #fff; font-size: 0.9rem;">
+                            🏢 {user['residence']}
+                        </span>
+                        {f'<span style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; color: #fff; font-size: 0.9rem;">🚪 Logement {user["logement"]}</span>' if user['type'] == 'Résident' else ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("### 📋 Informations de contact")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.write(f"**Nom:** {user['nom']}")
-        st.write(f"**Prénom:** {user['prenom']}")
-        st.write(f"**Email:** {user['email']}")
-        st.write(f"**Téléphone:** {user['telephone']}")
+        st.markdown(f"""
+            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin: 0;">📧 Email</p>
+                <p style="color: #fff; font-weight: 600; font-size: 1.1rem; margin: 0.5rem 0 0 0;">{user['email']}</p>
+            </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.write(f"**Type de compte:** {user['type']}")
-        st.write(f"**Résidence:** {user['residence']}")
-        if user['type'] == 'Résident':
-            st.write(f"**Logement:** {user['logement']}")
+        st.markdown(f"""
+            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin: 0;">📱 Téléphone</p>
+                <p style="color: #fff; font-weight: 600; font-size: 1.1rem; margin: 0.5rem 0 0 0;">{user['telephone'] if user['telephone'] else 'Non renseigné'}</p>
+            </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
     
-    st.subheader("Modifier mes informations")
+    st.markdown("### ✏️ Modifier mes informations")
     
     with st.form("update_profile"):
-        new_telephone = st.text_input("Nouveau téléphone", value=user['telephone'])
-        new_password = st.text_input("Nouveau mot de passe (laisser vide pour ne pas changer)", type="password")
+        new_telephone = st.text_input("📱 Nouveau téléphone", value=user['telephone'], placeholder="06 12 34 56 78")
+        new_password = st.text_input("🔒 Nouveau mot de passe", type="password", placeholder="Laisser vide pour ne pas changer")
+        st.caption("💡 Le mot de passe doit contenir : min 8 caractères, 1 majuscule, 1 chiffre")
         
-        if st.form_submit_button("💾 Enregistrer les modifications"):
+        if st.form_submit_button("💾 Enregistrer les modifications", use_container_width=True):
             conn = sqlite3.connect("data/lba_platform.db")
             cursor = conn.cursor()
             
@@ -64,7 +90,7 @@ def show_profil(user):
                 from utils.validators import validate_password
                 is_valid, msg = validate_password(new_password)
                 if not is_valid:
-                    st.error(msg)
+                    st.error(f"❌ {msg}")
                 else:
                     hashed_pw = hash_password(new_password)
                     cursor.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user['id']))
@@ -73,6 +99,7 @@ def show_profil(user):
             conn.close()
             
             st.success("✅ Informations mises à jour !")
+            st.balloons()
             st.session_state.user['telephone'] = new_telephone
             st.rerun()
 
@@ -95,15 +122,36 @@ def show_preferences_gestionnaire(user):
         st.info("🚧 Fonctionnalité en cours de développement")
 
 def show_fidelite(user):
-    st.subheader("Programme de Fidélité")
-    
-    st.markdown(f"### ⭐ Vous avez **{user['points']}** points !")
-    
+    # Card principal avec progression
     progression = (user['points'] % 100) / 100 * 100
-    st.progress(progression / 100)
-    st.caption(f"{100 - (user['points'] % 100)} points avant la prochaine récompense (10€ de réduction)")
+    points_restants = 100 - (user['points'] % 100)
+    palier_actuel = (user['points'] // 100) * 100
+    prochain_palier = palier_actuel + 100
     
-    st.markdown("---")
+    st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 2.5rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 20px 25px -5px rgba(240, 147, 251, 0.4);">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="font-size: 4rem; margin-bottom: 0.5rem;">⭐</div>
+                <h2 style="color: #fff; margin: 0; font-size: 2.5rem; font-weight: 700;">{user['points']} Points</h2>
+                <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0; font-size: 1.1rem;">Programme Fidélité Les Belles Années</p>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.2); height: 16px; border-radius: 8px; overflow: hidden; margin-bottom: 1rem;">
+                <div style="background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.8) 100%); height: 100%; width: {progression}%; border-radius: 8px; transition: width 0.5s ease;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 0.95rem;">Palier actuel: {palier_actuel} pts</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 0.95rem; font-weight: 700;">
+                        🎯 {points_restants} pts avant {prochain_palier}
+                    </p>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     
@@ -111,33 +159,72 @@ def show_fidelite(user):
         st.markdown("### 💰 Récompenses disponibles")
         
         recompenses = [
-            (100, "10€ de réduction sur le loyer"),
-            (250, "25€ de réduction sur le loyer"),
-            (500, "50€ de réduction sur le loyer"),
-            (1000, "100€ de réduction + cadeau surprise")
+            (100, "10€ de réduction loyer", "💵", "#10b981"),
+            (250, "25€ de réduction loyer", "💰", "#3b82f6"),
+            (500, "50€ de réduction loyer", "💸", "#f59e0b"),
+            (1000, "100€ + cadeau surprise", "🎁", "#ef4444")
         ]
         
-        for points_requis, recompense in recompenses:
+        for points_requis, recompense, icon, color in recompenses:
             if user['points'] >= points_requis:
-                st.success(f"✅ **{points_requis} pts:** {recompense}")
-                if st.button(f"Utiliser ({points_requis} pts)", key=f"use_{points_requis}"):
-                    st.info("Contactez l'accueil pour activer votre récompense !")
+                st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, {color}20 0%, {color}10 100%); padding: 1rem; border-radius: 12px; border-left: 4px solid {color}; margin-bottom: 0.75rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 1.5rem; margin-right: 0.5rem;">{icon}</span>
+                                <strong style="color: #fff;">{points_requis} pts</strong>
+                                <p style="color: rgba(255,255,255,0.8); margin: 0.25rem 0 0 0; font-size: 0.9rem;">{recompense}</p>
+                            </div>
+                            <span style="background: {color}; padding: 0.25rem 0.75rem; border-radius: 20px; color: #fff; font-size: 0.85rem; font-weight: 600;">✅ Disponible</span>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+                if st.button(f"🎉 Utiliser ({points_requis} pts)", key=f"use_{points_requis}"):
+                    st.success("✅ Contactez l'accueil pour activer votre récompense !")
+                    st.balloons()
             else:
-                st.info(f"🔒 **{points_requis} pts:** {recompense}")
+                progress_recompense = (user['points'] / points_requis) * 100
+                st.markdown(f"""
+                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.75rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div>
+                                <span style="font-size: 1.5rem; margin-right: 0.5rem; opacity: 0.5;">{icon}</span>
+                                <strong style="color: rgba(255,255,255,0.7);">{points_requis} pts</strong>
+                                <p style="color: rgba(255,255,255,0.6); margin: 0.25rem 0 0 0; font-size: 0.9rem;">{recompense}</p>
+                            </div>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">🔒 {points_requis - user['points']} pts restants</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div style="background: {color}; height: 100%; width: {progress_recompense}%; border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("### 🎯 Comment gagner des points ?")
+        st.markdown("### 🎯 Comment gagner des points")
         
-        st.write("**+3 pts** - Réserver un espace")
-        st.write("**+5 pts** - Publier une annonce marketplace")
-        st.write("**+5 pts** - Évaluer une intervention")
-        st.write("**+10 pts** - Participer à un événement")
-        st.write("**+25 pts** - Organiser un événement")
-        st.write("**+50 pts** - Parrainer un ami")
+        actions = [
+            ("🧺", "Réserver un espace", "+3 pts"),
+            ("🛍️", "Publier annonce marketplace", "+5 pts"),
+            ("⭐", "Évaluer intervention", "+5 pts"),
+            ("🎉", "Participer événement", "+10 pts"),
+            ("🎊", "Organiser événement", "+25 pts"),
+            ("🤝", "Parrainer un ami", "+50 pts")
+        ]
+        
+        for icon, action, points in actions:
+            st.markdown(f"""
+                <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="font-size: 1.2rem; margin-right: 0.5rem;">{icon}</span>
+                        <span style="color: rgba(255,255,255,0.9);">{action}</span>
+                    </div>
+                    <span style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 0.25rem 0.75rem; border-radius: 20px; color: #fff; font-size: 0.85rem; font-weight: 600;">{points}</span>
+                </div>
+            """, unsafe_allow_html=True)
     
-    st.markdown("---")
-    
-    st.subheader("📊 Historique des points")
+    st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
+    st.markdown("### 📊 Historique des points")
     
     conn = sqlite3.connect("data/lba_platform.db")
     cursor = conn.cursor()
@@ -157,10 +244,21 @@ def show_fidelite(user):
     historique = cursor.fetchall()
     
     if historique:
-        for action, date, points in historique:
-            st.write(f"**+{points} pts** - {action} - {date}")
+        for action, date, points in historique[:10]:
+            date_str = datetime.fromisoformat(str(date)).strftime('%d/%m/%Y %H:%M') if date else "Date inconnue"
+            st.markdown(f"""
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid #10b981;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: #10b981;">+{points} pts</strong>
+                            <span style="color: rgba(255,255,255,0.9); margin-left: 0.5rem;">{action}</span>
+                        </div>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">📅 {date_str}</span>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
     else:
-        st.info("Aucun historique pour le moment")
+        st.info("📭 Aucun historique pour le moment. Commencez à participer pour gagner des points !")
     
     conn.close()
 
